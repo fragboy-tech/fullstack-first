@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <h1>Register form</h1>
+
+  <form id="register-form">
+    <input type="email" name="email" placeholder="enter your email" required />
+    <br />
+    <br />
+    <input
+      type="password"
+      name="password"
+      placeholder="enter your password"
+      required
+    />
+    <br />
+    <br />
+    <input
+      type="password"
+      name="passwordValidation"
+      placeholder="enter your password again"
+      required
+    />
+    <button type="submit">Register</button>
+  </form>
+
+  <button onclick="goLogin()" id="login-button">Login</button>
+
+  <script>
+    const form = document.getElementById("register-form");
+    const goLogin = () => {
+      window.location.replace("/");
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = e.target.email.value;
+      const password = e.target.password.value;
+      const password2 = e.target.passwordValidation.value;
+      if (password !== password2) {
+        return window.alert("Nuuts ug taarahgui bn");
+      }
+
+      try {
+        const response = await fetch(`http://localhost:3000/register`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        }).catch(() => {
+          return window.alert("bvrtgvvlehed aldaa garlaa!");
+        });
+
+        const data = await response.json();
+        console.log(data);
+        if (data.status === "failed") {
+          return window.alert("Email bvrtgvvlehed aldaa garlaa!");
+        } else {
+          window.alert("Amjilttai bvrtgvvlelee");
+          window.location.replace("/");
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    });
+  </script>
+</html>
