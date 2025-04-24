@@ -1,18 +1,25 @@
-import express from "express";
-
-declare global {
-  namespace Express {
-    interface Request {
-      user?: any;
-    }
-  }
+import express, { Request, Response, NextFunction } from "express";
+export interface IAuthUser {
+  userId: string;
 }
+
+export interface IAuthRequest extends Request {
+  user?: IAuthUser;
+}
+
+// declare global {
+//   namespace Express {
+//     interface Request {
+//       user?: any;
+//     }
+//   }
+// }
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 
-import { Authrouter } from "../modules/auth/routes/route";
+import { authRouter } from "../modules/auth/routes/route";
 import { movieRouter } from "../modules/movie/routes/route";
 
 dotenv.config();
@@ -31,9 +38,9 @@ mongoose
   });
 
 const authMiddleware = (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
+  req: IAuthRequest,
+  res: Response,
+  next: NextFunction
 ) => {
   const authHeader = req.headers["authorization"];
 
@@ -52,7 +59,7 @@ const authMiddleware = (
     }
     const user = jwt.verify(token, process.env.SECRET_KEY);
 
-    req.user = user;
+    req.user = user as IAuthUser;
 
     next();
   } catch (e) {
@@ -60,7 +67,7 @@ const authMiddleware = (
   }
 };
 
-app.use("/", Authrouter);
+app.use("/", authRouter);
 app.use("/movies", authMiddleware, movieRouter);
 
 app.listen(3000, () => {

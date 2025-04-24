@@ -1,8 +1,8 @@
 import express from "express";
 import { Users } from "../../../db/model/userModel";
-export const Authrouter = express.Router();
+export const authRouter = express.Router();
 
-Authrouter.post("/login", async (req, res) => {
+authRouter.post("/login", async (req, res) => {
   try {
     const { password, email } = req.body;
 
@@ -14,7 +14,7 @@ Authrouter.post("/login", async (req, res) => {
     res.status(400).send(err.message || "Login failed");
   }
 });
-Authrouter.post("/register", async (req, res) => {
+authRouter.post("/register", async (req, res) => {
   const { password, email } = req.body;
 
   const user = await Users.register({ password, email });

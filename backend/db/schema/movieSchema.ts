@@ -18,6 +18,10 @@ export const movieSchema = new schema(
       type: String,
       required: true,
     },
+    createdBy: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true, collection: "movies" }
 );

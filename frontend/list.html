@@ -9,104 +9,124 @@
       rel="stylesheet"
     />
   </head>
-  <h1>List</h1>
-  <form id="search-form">
-    <input type="text" name="title" placeholder="search movie name" required />
-    <br />
-    <br />
-    <button type="submit">Search</button>
-  </form>
-  <form id="add-movie-form">
-    <button type=" submit">Add movie</button>
-  </form>
+  <body>
+    <div>
+      <button id="logout-button">Logout</button>
+      <h1>Movie List</h1>
+    </div>
 
-  <div id="list-container"></div>
+    <form id="search-form">
+      <input
+        type="text"
+        name="title"
+        placeholder="search movie name"
+        required
+      />
+      <br />
+      <br />
+      <button type="submit">Search</button>
+    </form>
+    <form id="add-movie-form">
+      <button type=" submit">Add movie</button>
+    </form>
 
-  <script>
-    const token = localStorage.getItem("auth-token");
-    if (!token) {
-      alert("Ta login hiigeegui bna");
-      window.location.href = "/";
-    }
-    const addMovieForm = document.getElementById("add-movie-form");
-    addMovieForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      window.location.replace("/add-movie");
-    });
-    const form = document.getElementById("search-form");
+    <div id="list-container"></div>
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const title = e.target.title.value;
+    <script>
+      const token = localStorage.getItem("auth-token");
+      if (!token) {
+        alert("Ta login hiigeegui bna");
+        window.location.href = "/";
+      }
+      const logoutButton = document.getElementById("logout-button");
+      logoutButton.addEventListener("click", () => {
+        localStorage.removeItem("auth-token");
+        window.location.replace("/");
+      });
+      const addMovieForm = document.getElementById("add-movie-form");
+      addMovieForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        window.location.replace("/add-movie");
+      });
+      const form = document.getElementById("search-form");
 
-      getList({ title });
-    });
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const title = e.target.title.value;
 
-    const getList = (queryParams) => {
-      // list avah fetch
+        getList({ title });
+      });
 
-      const params = new URLSearchParams(queryParams);
+      const getList = (queryParams) => {
+        // list avah fetch
 
-      const listElement = document.getElementById("list-container");
+        const params = new URLSearchParams(queryParams);
 
-      try {
-        fetch(`http://localhost:3000/movies?${params.toString()}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("auth-token")}`,
-          },
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            console.log(data);
-            if (data.length === 0) {
-              return window.alert("kino oldsngui!");
-            } else {
-              const list = document.createElement("ul");
+        const listElement = document.getElementById("list-container");
 
-              data.forEach((item) => {
-                const li = document.createElement("li");
-                li.innerHTML = `
+        try {
+          fetch(`http://localhost:3000/movies?${params.toString()}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("auth-token")}`,
+            },
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              console.log(data);
+              if (data.length === 0) {
+                return window.alert("kino oldsngui!");
+              } else {
+                const list = document.createElement("ul");
+
+                data.forEach((item) => {
+                  const li = document.createElement("li");
+                  li.innerHTML = `
                   <h2>${item.title}</h2>
                   <p>${item.description}</p>
                   <p>${item.genre}</p>
                   <img src="${item.image}" alt="${item.title}" />
                   <button onclick="deleteMovie('${item._id}')">Delete</button>
+                  <button onclick="editMovie('${item._id}')">Update</button>
                 `;
-                list.appendChild(li);
-              });
+                  list.appendChild(li);
+                });
 
-              listElement.innerHTML = ""; // Clear previous list
-              listElement.appendChild(list);
-            }
-          });
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    const deleteMovie = async (id) => {
-      const token = `Bearer ${localStorage.getItem("auth-token")}`;
-      try {
-        const res = await fetch(`http://localhost:3000/movies/${id}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token,
-          },
-        });
-
-        if (res.ok) {
-          window.alert("Amjilttai ustgalaa");
-          getList({});
-        } else {
-          window.alert("Ustgahad aldaa garlaa");
+                listElement.innerHTML = ""; // Clear previous list
+                listElement.appendChild(list);
+              }
+            });
+        } catch (e) {
+          console.log(e);
         }
-      } catch (e) {
-        console.log(e);
-      }
-    };
+      };
+      const deleteMovie = async (id) => {
+        const token = `Bearer ${localStorage.getItem("auth-token")}`;
+        try {
+          const res = await fetch(`http://localhost:3000/movies/${id}`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: token,
+            },
+          });
 
-    getList({});
-  </script>
+          if (res.ok) {
+            window.alert("Amjilttai ustgalaa");
+            getList({});
+          } else {
+            window.alert("Ustgahad aldaa garlaa");
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      };
+      const editMovie = (id) => {
+        window.location.replace(`/edit-movie?id=${id}`);
+      };
+
+      getList({});
+    </script>
+  </body>
 </html>

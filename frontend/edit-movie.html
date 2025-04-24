@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <title>Edit Movie</title>
+  </head>
+  <body>
+    <header>
+      <h1>Edit Movie</h1>
+    </header>
+    <main>
+      <form id="edit-movie-form">
+        <div>
+          <label for="title">Title:</label>
+          <input type="text" id="title" name="title" required />
+        </div>
+        <br />
+        <div>
+          <label for="genre">Genre:</label>
+          <input type="text" id="genre" name="genre" required />
+        </div>
+        <br />
+        <div>
+          <label for="image">Image URL:</label>
+          <input type="text" id="image" name="image" required />
+        </div>
+        <br />
+
+        <div>
+          <label for="description">Description:</label>
+          <textarea
+            id="description"
+            name="description"
+            rows="5"
+            required
+          ></textarea>
+        </div>
+        <button type="submit">Save Changes</button>
+      </form>
+    </main>
+    <footer>
+      <p>&copy; 2025 Movie Editor</p>
+    </footer>
+    <script>
+      const token = localStorage.getItem("auth-token");
+      if (!token) {
+        alert("Ta login hiigeegui bna");
+        window.location.href = "/";
+      }
+      const form = document.getElementById("edit-movie-form");
+      const movieId = new URLSearchParams(window.location.search).get("id");
+
+      async function fetchMovieDetails() {
+        const res = await fetch(`http://localhost:3000/movies/${movieId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        if (res.ok) {
+          form.title.value = data.title;
+          form.genre.value = data.genre;
+          form.image.value = data.image;
+          form.description.value = data.description;
+        } else {
+          alert("Failed to fetch movie details");
+        }
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const title = form.title.value;
+        const genre = form.genre.value;
+        const image = form.image.value;
+        const description = form.description.value;
+
+        const res = await fetch(`http://localhost:3000/movies/${movieId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ title, genre, image, description }),
+        });
+
+        if (res.ok) {
+          alert("Movie updated successfully!");
+          window.location.href = "/list";
+        } else {
+          alert("Failed to update movie");
+        }
+      });
+
+      fetchMovieDetails();
+    </script>
+  </body>
+</html>
