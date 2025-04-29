@@ -71,7 +71,8 @@ button {
   cursor: pointer;
   font-size: 15px;
 }
-button [id="logout-button"] {
+
+#logout-button {
   padding: 12px 18px;
   background-color: #2609e5;
   color: white;
@@ -80,6 +81,13 @@ button [id="logout-button"] {
   font-weight: bold;
   cursor: pointer;
   font-size: 30px;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
 }
 
 button:hover {
